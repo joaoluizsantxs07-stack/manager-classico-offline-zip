@@ -1,0 +1,42 @@
+
+name: Montar APK do Manager Classico
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar arquivos
+        uses: actions/checkout@v4
+
+      - name: Preparar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Preparar Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Extrair projeto
+        run: unzip -o ManagerClassicoAndroid_APK-pronto.zip
+
+      - name: Montar APK
+        run: |
+          cd ManagerClassicoAndroid
+          gradle --no-daemon assembleDebug
+
+      - name: Disponibilizar APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Manager-Classico-Offline-APK
+          path: ManagerClassicoAndroid/app/build/outputs/apk/debug/app-debug.apk
+          
